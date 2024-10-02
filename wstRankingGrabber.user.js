@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Snooker Rankings Grabber
-// @namespace    http://tampermonkey.net/
-// @version      2024-05-07
+// @namespace    pl.enux.wiki
+// @version      2024-10-02
 // @description  Grab player data from World Snooker Ranking
 // @author       Nux
 // @match        https://www.wst.tv/rankings/
@@ -17,9 +17,11 @@
     'use strict';
 
 	var uniquePlayers = new Map();
-
+	const SUSPICOUS_MIN = 110; // below seems too small
+	const EXPECTED_SIZE = 100; // maybe good
+	
 	// Function to extract player data and log unique positions
-	function extractPlayerData() {
+	function extractPlayerData(countElement) {
 		console.log('grabbing...');
 
 		const worldRankings = document.getElementById('world_rankings');
@@ -36,49 +38,76 @@
 		});
 
 		console.log('total grabbed: ', uniquePlayers.size);
+		
+		countElement.textContent = uniquePlayers.size;
+		if (uniquePlayers.size >= EXPECTED_SIZE) {
+			countElement.style.color="darkgreen";
+			countElement.style.fontWeight="bold";
+		}
 	}
 
 	function dumpPlayerData(clipHolder) {
+		if (uniquePlayers.size < SUSPICOUS_MIN) {
+			if (!confirm(`Seems like there are only ${uniquePlayers.size} players.\nYou should probably scroll to the end and try again.\n\nOr is ${uniquePlayers.size} enough?`)) {
+				return;
+			}
+		}
+		
 		//console.log(uniquePlayers);
 		let output = '';
+		let count = 0;
 		uniquePlayers.forEach((position, name) => {
 			output += `|${name}=${position}\n`;
+			count++;
 		});
 		console.log(output);
 		//clipHolder.textContent = output;
 		navigator.clipboard.writeText(output)
-			.then(() => alert('Text copied to clipboard!'))
+			.then(() => alert(`WikiText with ${count} players copied to clipboard!`))
 			.catch(err => console.error('Failed to copy text: ', err));
 	}
 
-	function initGrabber() {
+	// main init
+	function initOnReady() {
 		const parentElement = document.getElementById('world_rankings');
+		let {countElement} = initElements(parentElement);
+		initGrabber(parentElement, countElement);
+	}
 
+	// grab action init
+	function initGrabber(parentElement, countElement) {
 		// grab stuff on next/previous
 		parentElement.querySelectorAll('button').forEach((item) => {
 			console.log('init:', item);
 			item.addEventListener('click', () => {
-				extractPlayerData()
+				extractPlayerData(countElement)
 			});
 		})
 
 		// initial grab
-		extractPlayerData()
+		extractPlayerData(countElement)
+	}
 
+	// out elements
+	function initElements(parentElement) {
 		// Clip helper
 		const clipHolder = document.createElement('div');
 		parentElement.append(clipHolder);
 		
 		// Create and add the button to the page
 		const button = document.createElement('button');
-		button.textContent = 'Dump🤞';
+		button.innerHTML = 'Wiki 📋 (<cnt style="color:darkred">0</cnt>)';
+		button.title = 'Copy WikiText with players (Note! Scroll to the end first!)';
 		button.onclick = function() {
 			dumpPlayerData(clipHolder);
 		};
 
 		parentElement.append(button);
+		
+		let countElement = button.querySelector('cnt');
+		return {countElement, button};
 	}
-
+	
 	class WaitForCondition {
 		/**
 		 * 
@@ -120,7 +149,7 @@
 		var sections = document.querySelectorAll('#world_rankings section');
 		return sections && sections.length>5;
 	}, function() {
-		initGrabber();
+		initOnReady();
 	});
 
 })();
