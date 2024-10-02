@@ -4,7 +4,7 @@ Grab player data from World Snooker website.
 ### Installation
 
 1. Install [TamperMonkey for Firefox](https://addons.mozilla.org/firefox/addon/tampermonkey/) (or [TM for Chrome](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)).
-2. Then simply **[install this gadget](https://github.com/Eccenux/Snooker-Rankings-Grabber/raw/master/wstRankingGrabber.user.js)**.
+2. Then simply **[install this gadget](https://github.com/Eccenux/Snooker-Rankings-Grabber/raw/main/wstRankingGrabber.user.js)**.
 
 ### Data Update
 
