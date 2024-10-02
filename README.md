@@ -9,6 +9,6 @@ Grab player data from World Snooker website.
 ### Data Update
 
 1. Go to the ranking page: https://wst.tv/rankings/
-2. Scroll to the bottom of the ranking list.
+2. Scroll to the end of the ranking list.
 3. Press the "Wiki 📋" button.
 4. Edit [Template:Infobox snooker player/rankings](https://en.wikipedia.org/wiki/Template:Infobox_snooker_player/rankings) and replace the data under `<!-- Ranks -->` (but before `end_Ranks_data`).
